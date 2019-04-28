@@ -51,12 +51,25 @@ mongo.connect(process.env.DATABASE, (err, db) => {
    function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
+    }else{
+      res.redirect("/");
     }
-    res.redirect('/');
   };
     app.route('/profile').get(ensureAuthenticated, (req,res) => {
-       res.render(process.cwd() + '/views/pug/profile');
-  });
+      res.render(process.cwd() + '/views/pug/profile', {username: req.user.username});
+      });
+    
+    
+    
+    
+    app.route("/logout").get((req,res) => {
+      req.logout();
+      res.redirect("/");
+    });
+    
+    app.use((req,res,next) => {
+      res.staus(404).type("text").send("Not Found");
+    });
     
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
@@ -67,5 +80,5 @@ mongo.connect(process.env.DATABASE, (err, db) => {
 
 app.route('/')
   .get((req, res) => {
-    res.render(process.cwd() + '/views/pug/index.pug', {title: "Hello", message: "Please login56", showLogin: true});
+    res.render(process.cwd() + '/views/pug/index.pug', {title: "Home page", message: "Please login56", showLogin: true, showRegistration: true});
   });
