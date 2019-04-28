@@ -43,7 +43,20 @@ mongo.connect(process.env.DATABASE, (err, db) => {
         return done(null, user);
       });
     }));
+   
+    app.route("/login").post(passport.authenticate("local", {failureRedirect: "/"}), (req, res) => {
+      res.redirect("/profile");
+    });
     
+   function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/');
+  };
+    app.route('/profile').get(ensureAuthenticated, (req,res) => {
+       res.render(process.cwd() + '/views/pug/profile');
+  });
     
     app.listen(process.env.PORT || 3000, () => {
       console.log("Listening on port " + process.env.PORT);
@@ -56,4 +69,3 @@ app.route('/')
   .get((req, res) => {
     res.render(process.cwd() + '/views/pug/index.pug', {title: "Hello", message: "Please login56", showLogin: true});
   });
-
